@@ -1,7 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const { runQuery } = require('./scripts/dbQuery.cjs');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import cors from 'cors';
+import { runQuery } from './scripts/dbQuery.cjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3002;
@@ -15,6 +19,12 @@ app.use(express.static(path.join(__dirname, 'dist'), {
   setHeaders: (res, path) => {
     if (path.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript');
+    } else if (path.endsWith('.jsx')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (path.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html');
     }
   }
 }));
