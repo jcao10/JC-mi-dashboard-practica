@@ -11,57 +11,51 @@ app.use(cors());
 app.use(express.json());
 
 // Servir archivos estáticos desde la carpeta dist (generada por Vite)
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, 'dist'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
 
 // Ruta para obtener los datos de la consulta por canal
-app.get('/api/query', async (req, res) => {
+app.get('/api/query-by-channel', async (req, res) => {
   try {
-    console.log('Ejecutando consulta por canal...');
-    const data = await runQuery('byChannel');
-    console.log('Consulta ejecutada exitosamente');
+    const { startDate, endDate } = req.query;
+    const data = await runQuery('byChannel', startDate, endDate);
     res.json(data);
   } catch (err) {
-    console.error('Error detallado:', {
-      message: err.message,
-      code: err.code,
-      detail: err.detail,
-      hint: err.hint,
-      position: err.position,
-      where: err.where
-    });
-    res.status(500).json({ 
-      error: 'Error al obtener los datos',
-      details: err.message,
-      code: err.code
-    });
+    console.error('Error en query-by-channel:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
 // Ruta para obtener los datos de la consulta por día
 app.get('/api/query-by-day', async (req, res) => {
   try {
-    console.log('Ejecutando consulta por día...');
-    const data = await runQuery('byDay');
-    console.log('Consulta ejecutada exitosamente');
+    const { startDate, endDate } = req.query;
+    const data = await runQuery('byDay', startDate, endDate);
     res.json(data);
   } catch (err) {
-    console.error('Error detallado:', {
-      message: err.message,
-      code: err.code,
-      detail: err.detail,
-      hint: err.hint,
-      position: err.position,
-      where: err.where
-    });
-    res.status(500).json({ 
-      error: 'Error al obtener los datos',
-      details: err.message,
-      code: err.code
-    });
+    console.error('Error en query-by-day:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Manejar todas las rutas no definidas para soportar el enrutamiento del cliente
+// Endpoint para obtener volumen por exchange
+app.get('/api/query-volume-by-exchange', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const data = await runQuery('volumeByExchange', startDate, endDate);
+    res.json(data);
+  } catch (err) {
+    console.error('Error en query-volume-by-exchange:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Manejar rutas SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
