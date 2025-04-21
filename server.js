@@ -16,14 +16,12 @@ app.use(express.json());
 
 // Servir archivos estáticos desde la carpeta dist (generada por Vite)
 app.use(express.static(path.join(__dirname, 'dist'), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.js') || filePath.endsWith('.jsx')) {
       res.setHeader('Content-Type', 'application/javascript');
-    } else if (path.endsWith('.jsx')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (path.endsWith('.css')) {
+    } else if (filePath.endsWith('.css')) {
       res.setHeader('Content-Type', 'text/css');
-    } else if (path.endsWith('.html')) {
+    } else if (filePath.endsWith('.html')) {
       res.setHeader('Content-Type', 'text/html');
     }
   }
@@ -65,7 +63,7 @@ app.get('/api/query-volume-by-exchange', async (req, res) => {
   }
 });
 
-// Manejar rutas SPA
+// Manejar todas las rutas para SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
