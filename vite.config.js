@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/JC-mi-dashboard-practica/',
+  base: './',
   server: {
     port: 3002,
     proxy: {
