@@ -1,11 +1,7 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import cors from 'cors';
-import { runQuery } from './scripts/dbQuery.cjs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { runQuery } = require('./scripts/dbQuery.cjs');
 
 const app = express();
 const port = 3002;
@@ -16,13 +12,9 @@ app.use(express.json());
 
 // Servir archivos estáticos desde la carpeta dist (generada por Vite)
 app.use(express.static(path.join(__dirname, 'dist'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.js') || filePath.endsWith('.jsx')) {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript');
-    } else if (filePath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    } else if (filePath.endsWith('.html')) {
-      res.setHeader('Content-Type', 'text/html');
     }
   }
 }));
@@ -63,7 +55,7 @@ app.get('/api/query-volume-by-exchange', async (req, res) => {
   }
 });
 
-// Manejar todas las rutas para SPA
+// Manejar rutas SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
